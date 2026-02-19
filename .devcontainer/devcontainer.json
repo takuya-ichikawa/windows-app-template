@@ -11,7 +11,10 @@
         "eamodio.gitlens",
         "Gruntfuggly.todo-tree",
         "yoavbls.pretty-ts-errors",
-        "ms-vscode.vscode-typescript-next"
+        "ms-vscode.vscode-typescript-next",
+        "github.vscode-github-actions",
+        "formulahendry.auto-rename-tag",
+        "rodrigovallades.es7-react-js-snippets"
       ]
     }
   },

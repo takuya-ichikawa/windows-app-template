@@ -52,6 +52,8 @@ windows-app-template/
 │   ├── Dockerfile                   # Dev Container のベースイメージと依存設定
 │   └── devcontainer.json            # VS Code 拡張機能・ポート転送などの設定
 ├── .github/
+│   ├── workflows/
+│   │   └── release.yml              # リリース用 GitHub Actions ワークフロー
 │   └── copilot-instructions.md      # このファイル（開発ガイド）
 ├── src/
 │   ├── main/
@@ -79,20 +81,33 @@ windows-app-template/
 # 依存関係のインストール
 pnpm install
 
-# 開発モード
-pnpm dev           # Dev Container (Linux) ※ WSLg 経由でウィンドウ表示
-pnpm dev:win       # Windows 実機
+# 開発モード（Dev Container / Linux 環境）
+pnpm dev
 
-# プロダクションビルド
+# プロダクションビルド（動作確認用）
 pnpm build
+pnpm start
 
-# ビルド済みを起動
-pnpm start         # Dev Container (Linux) ※ WSLg 経由でウィンドウ表示
-pnpm start:win     # Windows 実機
+# Windows 向けインストーラ生成（CI のみ / windows-latest 上で実行）
+pnpm dist
 ```
 
-> Dev Container 内では `DISPLAY` 環境変数が自動設定される（`devcontainer.json` の `remoteEnv` で設定済み）。  
-> 初回または Rebuild 前は `DISPLAY=:1 pnpm start` のように手動で付ける。
+---
+
+## リリース手順
+
+1. 注釈付きタグを作成して push する
+
+```bash
+git tag -a v0.2.0 -m "Release v0.2.0"
+git push origin v0.2.0
+```
+
+3. GitHub Actions の `Release` ワークフローが自動起動し、`windows-latest` 上で `.exe` をビルド
+4. ビルド完了後、GitHub Releases にインストーラ（`.exe`）が自動添付される
+
+> **タグ命名規則**: `v{major}.{minor}.{patch}`（例: `v0.1.0`、`v1.0.0`）  
+> `v*` パターンにマッチするタグのみワークフローがトリガーされる。
 
 ---
 
