@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, Menu, shell } from "electron";
 import { join } from "path";
 import { autoUpdater } from "electron-updater";
 
@@ -28,6 +28,47 @@ function createWindow(): void {
 app.whenReady().then(() => {
   createWindow();
   autoUpdater.checkForUpdatesAndNotify();
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "ファイル",
+      submenu: [{ role: "quit", label: "終了" }],
+    },
+    {
+      label: "編集",
+      submenu: [
+        { role: "undo", label: "元に戻す" },
+        { role: "redo", label: "やり直す" },
+        { type: "separator" },
+        { role: "cut", label: "切り取り" },
+        { role: "copy", label: "コピー" },
+        { role: "paste", label: "貼り付け" },
+        { role: "selectAll", label: "すべて選択" },
+      ],
+    },
+    {
+      label: "表示",
+      submenu: [
+        { role: "reload", label: "再読み込み" },
+        { role: "forceReload", label: "強制再読み込み" },
+        { role: "toggleDevTools", label: "開発者ツール" },
+        { type: "separator" },
+        { role: "resetZoom", label: "ズームをリセット" },
+        { role: "zoomIn", label: "拡大" },
+        { role: "zoomOut", label: "縮小" },
+        { type: "separator" },
+        { role: "togglefullscreen", label: "フルスクリーン" },
+      ],
+    },
+    {
+      label: "ウィンドウ",
+      submenu: [
+        { role: "minimize", label: "最小化" },
+        { role: "close", label: "閉じる" },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(menu);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

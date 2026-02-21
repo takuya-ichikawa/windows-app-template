@@ -41,6 +41,8 @@
 | [electron-vite](https://electron-vite.org/) | ^5.0.0 | Electron 向け Vite ラッパー（ビルド・開発サーバー） |
 | [React](https://react.dev/) | ^19.0.0 | UI ライブラリ |
 | [TypeScript](https://www.typescriptlang.org/) | ^5.2.0 | 型安全な JavaScript |
+| [Mantine](https://mantine.dev/) | ^8.0.0 | UI コンポーネントライブラリ |
+| [PostCSS](https://postcss.org/) + postcss-preset-mantine | - | Mantine CSS 変数・テーマカスタマイズ |
 
 ---
 
@@ -57,15 +59,22 @@ windows-app-template/
 │   └── copilot-instructions.md      # このファイル（開発ガイド）
 ├── src/
 │   ├── main/
-│   │   └── index.ts                 # Electron メインプロセス
+│   │   ├── index.ts                 # Electron メインプロセス
+│   │   └── ipc/                     # IPC ハンドラ（機能ごとに分割）
 │   ├── preload/
 │   │   └── index.ts                 # Preload スクリプト（contextBridge）
 │   └── renderer/
+│       ├── assets/                  # 画像・フォントなど静的リソース
+│       ├── components/              # 再利用可能な UI コンポーネント
+│       ├── hooks/                   # カスタム React フック
+│       ├── pages/                   # ページ単位のコンポーネント
+│       ├── styles/                  # Mantine テーマ・グローバル CSS
+│       ├── App.tsx                  # ルートコンポーネント
 │       ├── index.html               # HTML エントリポイント
-│       ├── index.tsx                # React エントリポイント
-│       └── App.tsx                  # ルートコンポーネント
+│       └── index.tsx                # React エントリポイント
 ├── out/                             # electron-vite ビルド出力先（git 管理外）
 ├── electron.vite.config.ts          # electron-vite 設定
+├── postcss.config.cjs               # PostCSS 設定（Mantine CSS 変数対応）
 ├── tsconfig.json                    # TypeScript 設定（ルート）
 ├── tsconfig.node.json               # main / preload 用 TypeScript 設定
 ├── tsconfig.web.json                # renderer 用 TypeScript 設定
@@ -116,5 +125,8 @@ git push origin v0.2.0
 - レンダラーは React (TSX) ベース。`src/renderer/App.tsx` がルートコンポーネント
 - `contextIsolation: true` / `nodeIntegration: false` のセキュアな設定を採用
 - メインプロセスとレンダラー間の通信は `src/preload/index.ts` の `contextBridge` 経由で行う
+- UI ライブラリは **Mantine v8**。`MantineProvider` でルートをラップ済み、`defaultColorScheme="dark"` を設定
+- テーマカスタマイズは `src/renderer/styles/` に theme ファイルを追加し、`MantineProvider` の `theme` prop に渡す
+- IPC ハンドラは `src/main/ipc/` に機能ごとに分割して配置する
 
 ---
