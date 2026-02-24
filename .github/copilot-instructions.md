@@ -97,8 +97,8 @@ pnpm dev
 pnpm build
 pnpm start
 
-# Windows 向けインストーラ生成（CI のみ / windows-latest 上で実行）
-pnpm dist
+# Windows 向けインストーラ生成 + GitHub Releases へ公開（CI のみ / windows-latest 上で実行）
+pnpm release
 ```
 
 ---
@@ -117,6 +117,17 @@ git push origin v0.2.0
 
 > **タグ命名規則**: `v{major}.{minor}.{patch}`（例: `v0.1.0`、`v1.0.0`）  
 > `v*` パターンにマッチするタグのみワークフローがトリガーされる。
+
+---
+
+## 自動更新（Auto Update）の仕組み
+
+`electron-updater` を使ってこのリポジトリの GitHub Releases から自動更新を行う。
+
+リポジトリはパブリックのため認証不要。`secrets.GITHUB_TOKEN`（Actions デフォルト）で Releases へのアップロードが行われ、エンドユーザーは PAT なしで `latest.yml` を取得できる。
+
+> **テンプレート利用者へ**: `app.setAppUserModelId()` の引数と `build.appId` は必ず一致させること。  
+> 不一致の場合 Windows 通知センターへの登録が失敗し、更新通知が表示されない。
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "my-electron-app",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "My Electron App",
   "author": "takuya-ichikawa",
   "main": "out/main/index.js",
@@ -8,7 +8,7 @@
     "dev": "electron-vite dev -- --no-sandbox",
     "build": "electron-vite build",
     "start": "electron-vite preview -- --no-sandbox",
-    "dist": "electron-vite build && electron-builder --win --publish never"
+    "release": "electron-vite build && electron-builder --win --publish always"
   },
   "build": {
     "appId": "com.example.my-electron-app",
@@ -69,6 +69,7 @@
     ]
   },
   "dependencies": {
+    "electron-log": "^5.4.3",
     "electron-updater": "^6.8.3"
   }
 }

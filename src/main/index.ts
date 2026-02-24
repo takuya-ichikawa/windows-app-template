@@ -1,6 +1,21 @@
 import { app, BrowserWindow, Menu, shell } from "electron";
 import { join } from "path";
 import { autoUpdater } from "electron-updater";
+import log from "electron-log";
+
+const APP_ID = "com.example.my-electron-app";
+
+// ログ設定
+// ファイル出力先 (Windows): %APPDATA%\MyElectronApp\logs\main.log
+//   レベル "info" = info / warn / error をファイルに書き込む（verbose / debug / silly は除外）
+log.transports.file.level = "info";
+log.transports.file.maxSize = 5 * 1024 * 1024; // 5MB でローテーション
+// コンソール出力:
+//   開発中 → "silly"（全レベルをターミナルに表示）
+//   パッケージ済み → "warn"（warn / error のみ DevTools に表示）
+log.transports.console.level = app.isPackaged ? "warn" : "silly";
+// Node.js / Electron の未捕捉例外もログに記録
+log.errorHandler.startCatching();
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -26,6 +41,11 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  log.info(`App starting. version=${app.getVersion()} isPackaged=${app.isPackaged}`);
+
+  // Windows Toast 通知の AppUserModelId を登録（package.json の appId と合わせる）
+  app.setAppUserModelId(APP_ID);
+
   // バージョン情報パネルの設定（ヘルプメニューから表示）
   app.setAboutPanelOptions({
     applicationName: app.getName(),
@@ -33,7 +53,17 @@ app.whenReady().then(() => {
   });
 
   createWindow();
-  autoUpdater.checkForUpdatesAndNotify();
+
+  // パッケージ済みアプリのみ自動更新チェックを実行
+  if (app.isPackaged) {
+    autoUpdater.logger = log;
+    autoUpdater.on("error", (err) => {
+      log.error("[AutoUpdater] error:", err.message ?? err);
+    });
+    autoUpdater.checkForUpdatesAndNotify().catch((err) => {
+      log.error("[AutoUpdater] checkForUpdatesAndNotify failed:", err.message ?? err);
+    });
+  }
 
   const menu = Menu.buildFromTemplate([
     {
@@ -91,5 +121,6 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  log.info("App window-all-closed.");
   if (process.platform !== "darwin") app.quit();
 });
