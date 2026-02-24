@@ -26,6 +26,12 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // バージョン情報パネルの設定（ヘルプメニューから表示）
+  app.setAboutPanelOptions({
+    applicationName: app.getName(),
+    applicationVersion: app.getVersion(),
+  });
+
   createWindow();
   autoUpdater.checkForUpdatesAndNotify();
 
@@ -65,6 +71,15 @@ app.whenReady().then(() => {
       submenu: [
         { role: "minimize", label: "最小化" },
         { role: "close", label: "閉じる" },
+      ],
+    },
+    {
+      label: "ヘルプ",
+      submenu: [
+        {
+          label: "バージョン情報",
+          click: () => app.showAboutPanel(),
+        },
       ],
     },
   ]);
